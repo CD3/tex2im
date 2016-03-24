@@ -197,23 +197,27 @@ cd "$homedir"
 dvips -o $tmpdir/out.eps $tmpdir/out.dvi 2> /dev/null
 
 #
-# Transparent background
+# Convert to output image format
 #
 
-if [ $trans -eq 1 ]; then
-	if [ $aa -eq 1 ]; then
-		convert -trim -border 10 +adjoin -antialias -bordercolor $color1 -transparent $color1 -density $resolution $tmpdir/out.eps $tmpdir/out.$format	
-	else                                                               
-		convert -trim -border 10 +adjoin +antialias -bordercolor $color1 -transparent $color1 -density $resolution $tmpdir/out.eps $tmpdir/out.$format	
-	fi
-else	
-	if [ $aa -eq 1 ]; then
-		convert -trim -border 10 +adjoin -antialias -bordercolor $color1 -density $resolution $tmpdir/out.eps $tmpdir/out.$format	
-	else
-		convert -trim -border 10 +adjoin +antialias -bordercolor $color1 -density $resolution $tmpdir/out.eps $tmpdir/out.$format	
-	fi
+# common options
+convert="convert -trim -border 10 -bordercolor $color1 +adjoin -density $resolution"
+# anti aliasing
+if [ $aa -eq 1 ]; then
+  convert="$convert -antialias"
+else
+  convert="$convert +antialias"
 fi
 
+# transparent background
+if [ $trans -eq 1 ]; then
+  convert="$convert -transparent $color1"
+fi
+
+# files
+convert="$convert $tmpdir/out.eps $tmpdir/out.$format"
+# run convert command
+$convert
 
 if [ -e $tmpdir/out.$format ]; then
 	mv $tmpdir/out.$format $outfile
