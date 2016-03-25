@@ -36,20 +36,20 @@ See the commit log.
 
 Let's play around in the examples directory. Just type:
 
-> tex2im examples/example1.tex
+    > tex2im examples/example1.tex
 
 And you'll get a nice formula in a file named "example1.png"
 If you need color, look at example 2:
 
-> tex2im -b yellow -t blue examples/example2.tex
+    > tex2im -b yellow -t blue examples/example2.tex
 
 This time, the result is a color formula.
 
-> tex2im "\sum_{i=0}^5 x_i^2"
+    > tex2im "\sum_{i=0}^5 x_i^2"
 
 generates a file named 'out.png', containing the formula
 
-> tex2im *.tex
+    > tex2im *.tex
 
 this is how multiple files can be processed.
 
