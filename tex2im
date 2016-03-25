@@ -7,15 +7,17 @@
 # Required software: latex, convert (image magic)           #
 # to get color, the latex color package is required         #
 #############################################################
-# Version 1.8  (http://www.nought.de/tex2im.html)           #
 # published under the GNU public licence (GPL)              #
-# (c) 14. May 2004 by Andreas Reigber                   #
+# (c) 14. May 2004 by Andreas Reigber                       #
 # Email: anderl@nought.de                                   #
+#############################################################
+# (c) 2016 by CD Clark III                                  #
 #############################################################
 
 #
 # Default values
 #
+version="version > 1.8 (https://github.com/CD3/tex2im)"
 
 resolution="150x150"
 format="png"
@@ -71,7 +73,7 @@ Options:
 -x file    file containing extra header lines.
            default: ~/.tex2im_header"
 			exit 0 ;;
-		v) echo "TEX2IM Version 1.8"
+		v) echo $version
 			exit 0 ;;
 		r) resolution=$OPTARG;;
 		o) outfile=$OPTARG;;

@@ -1,0 +1,23 @@
+#! /bin/bash
+
+for ifile in $*
+do
+  ofile=${ifile%.*}.tex
+  if [ ! -e $ifile ]; then
+    echo "'$ifile' does not exists. Skipping."
+  fi
+
+  if [ -e $ofile ]; then
+    oofile=$ifile.tex
+    echo "'$ofile' exists. Trying '$oofile' instead."
+    ofile=$oofile
+  fi
+
+  if [ -e $ofile ]; then
+    oofile=$ifile.tex
+    echo "'$ofile' exists. Cannot name automatically. Please remove one or both of these files. Skipping."
+    ofile=$oofile
+  fi
+
+  identify -format "%[comment]" $ifile > $ofile
+done
