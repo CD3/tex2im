@@ -53,7 +53,7 @@ Options:
 -h         show help
 -a         change status of antialiasing
            default is on for normal mode and
-			  off for transparent mode
+    			 off for transparent mode
 -o file    specifies output filename, 
            default is inputfile with new extension
 -f expr    specifies output format, 
