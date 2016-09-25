@@ -28,6 +28,7 @@ noformula=0
 aa=1
 extra_header="$HOME/.tex2im_header"
 fontsize=12
+border=0
 cmdline="$(basename $0) $*"
 
 if [ -f ~/.tex2imrc ]; then
@@ -41,7 +42,7 @@ if [ $# -lt 1 ]; then
 	exit 1
 fi
 
-while getopts hanzb:t:f:o:r:vx:s: Optionen; do
+while getopts hanzb:t:f:o:r:vx:s:B: Optionen; do
 	case $Optionen in
 		h) echo "tex2im [options] inputfile
 
@@ -73,6 +74,8 @@ Options:
            default: off
 -s         font size
            default: 12
+-B         border width
+           default: 0 
 -x file    file containing extra header lines.
            default: ~/.tex2im_header"
 			exit 0 ;;
@@ -93,6 +96,7 @@ Options:
 		f) format=$OPTARG;;
     x) extra_header=$OPTARG;; 		
     s) fontsize=$OPTARG;; 		
+    B) border=$OPTARG;; 		
 	esac
 done
 
@@ -202,16 +206,20 @@ cd $tmpdir
 for f in $homedir/*.eps; do
     test -f ${f##*/} || ln -s $f . # multi-processing!
 done
-latex -interaction=batchmode out.tex > /dev/null
+latex="latex -interaction=batchmode out.tex"
+echo "running: '$latex'"
+eval $latex > /dev/null
 cd "$homedir"
-dvips -o $tmpdir/out.eps $tmpdir/out.dvi 2> /dev/null
+dvips="dvips -o $tmpdir/out.eps $tmpdir/out.dvi"
+echo "running: '$dvips'"
+eval $dvips 2> /dev/null
 
 #
 # Convert to output image format
 #
 
 # common options
-convert="convert -trim -border 10 -bordercolor $color1 +adjoin -density $resolution"
+convert="convert -trim -border $border -bordercolor $color1 +adjoin -density $resolution"
 # anti aliasing
 if [ $aa -eq 1 ]; then
   convert="$convert -antialias"
@@ -229,6 +237,7 @@ convert="$convert -comment @$tmpdir/in.tex"
 # files
 convert="$convert $tmpdir/out.eps $tmpdir/out.$format"
 # run convert command
+echo "running: '$convert'"
 eval $convert
 
 if [ -e $tmpdir/out.$format ]; then
