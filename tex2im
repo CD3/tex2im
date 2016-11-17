@@ -140,6 +140,7 @@ fi
 # Here we go
 #
 
+# Write preamble
 (
 cat << ENDHEADER1
 \documentclass[${fontsize}pt]{article}
@@ -149,16 +150,14 @@ cat << ENDHEADER1
 ENDHEADER1
 ) > $tmpdir/out.tex
 
-#
-# Do we have a file containing extra files to include into the header?
-#
-
+# Add extra header lines if available
 if [ -f $extra_header ]; then
 	(
 	cat $extra_header
 	) >> $tmpdir/out.tex
 fi
 
+# Start document
 if [ $noformula -eq 1 ]; then
 (
 cat << ENDHEADER2
@@ -178,6 +177,7 @@ ENDHEADER2
 ) >> $tmpdir/out.tex
 fi
 
+# write the latex code, filtering out comments
 echo "% This image was generated from the latex code below using tex2im with the following command." > $tmpdir/in.tex
 echo "% $cmdline" >> $tmpdir/in.tex
 if [ -e "$infile" ]; then
@@ -185,8 +185,9 @@ if [ -e "$infile" ]; then
 else
 	echo $infile >> $tmpdir/in.tex
 fi	
-cat $tmpdir/in.tex >> $tmpdir/out.tex
+cat $tmpdir/in.tex | grep '^[^#]' >> $tmpdir/out.tex
 
+# Close the document
 if [ $noformula -eq 1 ]; then
 (
 cat << ENDFOOTER
@@ -202,6 +203,10 @@ ENDFOOTER
 ) >> $tmpdir/out.tex
 fi
 
+
+
+
+# Build the image
 cd $tmpdir
 for f in $homedir/*.eps; do
     test -f ${f##*/} || ln -s $f . # multi-processing!
