@@ -237,7 +237,7 @@ if [ $trans -eq 1 ]; then
   convert="$convert -transparent $color1"
 fi
 # add tex code to the image comment
-convert="$convert -comment @$tmpdir/in.tex"
+convert="$convert -comment $tmpdir/in.tex"
 
 # files
 convert="$convert $tmpdir/out.eps $tmpdir/out.$format"
