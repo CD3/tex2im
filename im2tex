@@ -19,5 +19,5 @@ do
     ofile=$oofile
   fi
 
-  identify -format "%[comment]" $ifile > $ofile
+  identify -format "%[comment]" $ifile | sed 's/^%/#/' >> $ofile
 done
