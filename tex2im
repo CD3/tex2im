@@ -30,6 +30,7 @@ extra_header="$HOME/.tex2im_header"
 fontsize=12
 border=0
 debug=0
+cmdline="$(basename $0) $*"
 
 if [ -f ~/.tex2imrc ]; then
 	source ~/.tex2imrc
@@ -124,14 +125,6 @@ homedir="`pwd`" || exit 1
 # Names for input and output files
 #
 
-cmdline_base="$(basename $0)"
-for ((i = 1; i < $OPTIND; i++))
-do
-  eval cmdline_base=\"${cmdline_base} \$$i\"
-done
-
-
-
 while [ $OPTIND -le $# ]
 do
 
@@ -188,9 +181,8 @@ ENDHEADER2
 fi
 
 # write the latex code, filtering out comments
-cmdline="$cmdline_base $infile"
-echo "% This image was generated from the latex code below using tex2im." > $tmpdir/in.tex
-echo "% CMD: $cmdline" >> $tmpdir/in.tex
+echo "% This image was generated from the latex code below using tex2im with the following command." > $tmpdir/in.tex
+echo "$cmdline" | sed "s/^/% /" >> $tmpdir/in.tex
 if [ -e "$infile" ]; then
 	cat $infile >> $tmpdir/in.tex
 else
@@ -248,7 +240,6 @@ if [ $trans -eq 1 ]; then
   convert="$convert -transparent $color1"
 fi
 # add tex code to the image comment
-# Note: the @ symbol tells convert to read the comments from a file.
 convert="$convert -comment @$tmpdir/in.tex"
 
 # files
