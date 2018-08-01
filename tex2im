@@ -8,6 +8,7 @@ import sys
 import shutil
 import re
 import subprocess
+import base64
 
 __version__ = "2.-1"
 
@@ -103,7 +104,6 @@ parser.add_argument("-f", "--output-format",
 
 parser.add_argument("-o", "--output-basename",
                     action="store",
-                    default="out",
                     help="Basename to use for output filename. Image format extension will be appended.")
 
 args = parser.parse_args()
@@ -131,10 +131,12 @@ def tex2im(args,i=0):
   # we need a file name 'in.tex' in the tmpdir to embed in the image comment
   # with convert. TODO: write a shebang to in.tex
   latex_snippet = args.latex_snippet_or_file[i]
+  input_file = None
   if os.path.isfile(latex_snippet):
-      shutil.copyfile(latex_snippet, os.path.join(tmpdir,"in.tex"))
-      logging.info("{} is a file, reading now".format(latex_snippet))
-      with open(latex_snippet) as f:
+      input_file = os.path.abspath(latex_snippet)
+      shutil.copyfile(input_file, os.path.join(tmpdir,"in.tex"))
+      logging.info("{} is a file, reading now".format(input_file))
+      with open(input_file) as f:
           # read lines, but remove comments
           lines = filter(lambda x: not re.match('\s*#', x), f.readlines())
           latex_snippet = ''.join(lines).strip()
@@ -227,16 +229,22 @@ def tex2im(args,i=0):
   # generate output file name from input filename (if input is actually a file)
   # or output_basename option
   output_basename = None
-  if os.path.isfile( args.latex_snippet_or_file[i] ):
-    output_basename = os.path.basename( args.latex_snippet_or_file[i] )
+  if input_file is not None:
+    output_basename = os.path.basename( input_file )
     output_basename,_ = os.path.splitext( output_basename )
-  if args.output_basename:
-    output_basename = args.output_basename
+  else:
+    output_basename = 'out'
+    if args.output_basename:
+      output_basename = args.output_basename
     if len(args.latex_snippet_or_file) > 1:
       output_basename += "-%d"%i
 
+  output_ext = args.output_format
+  if args.output_format == "html":
+    output_ext = "png"
+
   # TODO: handle .html seprately
-  output_file = "{}.{}".format(output_basename,args.output_format)
+  output_file = "{}.{}".format(output_basename,output_ext)
 
 
   # convert image create by LaTeX to format requested
@@ -250,6 +258,18 @@ def tex2im(args,i=0):
     logging.error("convert command: {}".format(convert_cmd))
     logging.error("convert output:")
     logging.error(res.stdout.decode('utf-8'))
+
+  # if output format was html, convert the png we created
+  # to an embedded html tag
+  if args.output_format == "html":
+    with open( output_file, 'rb' ) as f:
+      text = f.read()
+    code = base64.b64encode(text).decode('utf-8')
+    text  = r'''<img src="data:image/{fmt};base64,{code}" {opts}>'''.format(fmt="png",code=code,opts="")
+    output_file = "{}.{}".format(output_basename,"html")
+    with open( output_file, 'w' ) as f:
+      f.write(text)
+
 
 
   # copy image to working directory
