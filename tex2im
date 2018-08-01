@@ -10,7 +10,7 @@ import re
 import subprocess
 import base64
 
-__version__ = '2.0'
+__version__ = '2.0.1'
 
 # a text-list class for accumulating lines of text
 class tlist(list):
