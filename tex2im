@@ -126,23 +126,16 @@ def tex2im(args,i=0):
   logging.info("created {}".format(tmpdir))
 
 
-  # if snippet is a filename, copy it to the tmpdir and read it in
-  # if snippet is not a file, write it to the tmp dir
-  # we need a file name 'in.tex' in the tmpdir to embed in the image comment
-  # with convert. TODO: write a shebang to in.tex
+  # check if snippet is actually a filename or not
   latex_snippet = args.latex_snippet_or_file[i]
   input_file = None
   if os.path.isfile(latex_snippet):
       input_file = os.path.abspath(latex_snippet)
-      shutil.copyfile(input_file, os.path.join(tmpdir,"in.tex"))
       logging.info("{} is a file, reading now".format(input_file))
       with open(input_file) as f:
           # read lines, but remove comments
           lines = filter(lambda x: not re.match('\s*#', x), f.readlines())
           latex_snippet = ''.join(lines).strip()
-  else:
-    with open(os.path.join(tmpdir,"in.tex"),'w') as f:
-      f.write(latex_snippet)
 
   logging.info("LaTeX snippet: {}".format(latex_snippet))
 
@@ -222,10 +215,6 @@ def tex2im(args,i=0):
     convert_cmd += " -transparent {}".format(args.background_color)
 
 
-  # add tex code to comment
-  # need to write the snippet to a file
-  convert_cmd += " -comment @{}/in.tex"
-
   # generate output file name from input filename (if input is actually a file)
   # or output_basename option
   output_basename = None
@@ -242,10 +231,15 @@ def tex2im(args,i=0):
   output_ext = args.output_format
   if args.output_format == "html":
     output_ext = "png"
-
-  # TODO: handle .html seprately
   output_file = "{}.{}".format(output_basename,output_ext)
 
+
+  # add comment containing LaTeX
+  comment_lines = tlist()
+  comment_lines += "# This image was created with tex2im (https://github.com/CD3/tex2im)"
+  comment_lines += latex_snippet.replace('\\','\\\\')
+  comment_lines += ""
+  convert_cmd += " -comment '{COMMENT}'".format(COMMENT='\n'.join(comment_lines))
 
   # convert image create by LaTeX to format requested
   convert_cmd += " out.pdf"
@@ -271,6 +265,17 @@ def tex2im(args,i=0):
       f.write(text)
 
 
+  # write latex code to image metadata
+  # comment_lines = tlist()
+  # comment_lines += "# This image was created with tex2im (https://github.com/CD3/tex2im)"
+  # comment_lines += latex_snippet
+  # exiftool_cmd = "exiftool -comment='{COMMENT}' {FILE}".format(COMMENT='<newline>'.join(comment_lines),FILE=output_file)
+  # res = subprocess.run( exiftool_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT )
+  # if res.returncode:
+    # logging.error("exiftool command returned non-zero status")
+    # logging.error("exiftool command: {}".format(exiftool_cmd))
+    # logging.error("exiftool output:")
+    # logging.error(res.stdout.decode('utf-8'))
 
   # copy image to working directory
   logging.info("copying file back to {}".format(os.path.join(curdir,output_file)))

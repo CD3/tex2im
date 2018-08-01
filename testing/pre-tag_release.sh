@@ -2,4 +2,4 @@
 
 root=$(git rev-parse --show-toplevel)
 cd $root/testing
-cram test.t
+cram *.t
