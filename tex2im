@@ -215,23 +215,30 @@ def tex2im(args,i=0):
     convert_cmd += " -transparent {}".format(args.background_color)
 
 
+  if args.output_basename and len(args.latex_snippet_or_file) == 1:
+  # if the user gave use an output filename, and only one equation, then use
+  # what they gave
+    output_file = args.output_basename
+    output_basename,_ = os.path.splitext( output_file )
+  else:
+  # otherwise, figure out what the output filename should be.
   # generate output file name from input filename (if input is actually a file)
   # or output_basename option
-  output_basename = None
-  if input_file is not None:
-    output_basename = os.path.basename( input_file )
-    output_basename,_ = os.path.splitext( output_basename )
-  else:
-    output_basename = 'out'
-    if args.output_basename:
-      output_basename = args.output_basename
-    if len(args.latex_snippet_or_file) > 1:
-      output_basename += "-%d"%i
+    output_basename = None
+    if input_file is not None:
+      output_basename = os.path.basename( input_file )
+      output_basename,_ = os.path.splitext( output_basename )
+    else:
+      output_basename = 'out'
+      if args.output_basename:
+        output_basename = args.output_basename
+      if len(args.latex_snippet_or_file) > 1:
+        output_basename += "-%d"%i
 
-  output_ext = args.output_format
-  if args.output_format == "html":
-    output_ext = "png"
-  output_file = "{}.{}".format(output_basename,output_ext)
+    output_ext = args.output_format
+    if args.output_format == "html":
+      output_ext = "png"
+    output_file = "{}.{}".format(output_basename,output_ext)
 
 
   # add comment containing LaTeX
