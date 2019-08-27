@@ -74,7 +74,9 @@ parser.add_argument("-n", "--no-equation-environment",
                     action="store_true",
                     help="Do not wrap snippet in equation environment. Useful if you want to use your own environment.")
 
-
+parser.add_argument("-C", "--no-comment",
+                    action="store_true",
+                    help="Do not embed latex snippet into comment field of output image. Sometimes `convert` does not have 'permission' to uset the comment field.")
 
 
 parser.add_argument("-a", "--anti-aliasing",
@@ -240,13 +242,18 @@ def tex2im(args,i=0):
       output_ext = "png"
     output_file = "{}.{}".format(output_basename,output_ext)
 
+  # split output file name into directory a filename parts
+  output_dir,output_file = os.path.split(output_file)
+  if output_dir == "":
+    output_dir = curdir
 
   # add comment containing LaTeX
   comment_lines = tlist()
   comment_lines += "# This image was created with tex2im (https://github.com/CD3/tex2im)"
   comment_lines += latex_snippet.replace('\\','\\\\')
   comment_lines += ""
-  convert_cmd += " -comment '{COMMENT}'".format(COMMENT='\n'.join(comment_lines))
+  if not args.no_comment:
+    convert_cmd += " -comment '{COMMENT}'".format(COMMENT='\n'.join(comment_lines))
 
   # convert image create by LaTeX to format requested
   convert_cmd += " out.pdf"
@@ -286,7 +293,7 @@ def tex2im(args,i=0):
 
   # copy image to working directory
   logging.info("copying file back to {}".format(os.path.join(curdir,output_file)))
-  shutil.copyfile(output_file, os.path.join(curdir,output_file))
+  shutil.copyfile(output_file, os.path.join(output_dir,output_file))
 
 
   os.chdir(curdir)
