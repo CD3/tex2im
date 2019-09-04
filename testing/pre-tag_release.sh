@@ -1,4 +1,4 @@
-#! /bin/bas
+#! /bin/bash
 
 root=$(git rev-parse --show-toplevel)
 cd $root/testing

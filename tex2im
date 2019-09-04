@@ -10,7 +10,7 @@ import re
 import subprocess
 import base64
 
-__version__ = '2.0.1'
+__version__ = '2.0.2'
 
 # a text-list class for accumulating lines of text
 class tlist(list):
@@ -217,30 +217,28 @@ def tex2im(args,i=0):
     convert_cmd += " -transparent {}".format(args.background_color)
 
 
-  if args.output_basename and len(args.latex_snippet_or_file) == 1:
-  # if the user gave use an output filename, and only one equation, then use
-  # what they gave
-    output_file = args.output_basename
-    output_basename,_ = os.path.splitext( output_file )
-  else:
-  # otherwise, figure out what the output filename should be.
-  # generate output file name from input filename (if input is actually a file)
-  # or output_basename option
-    output_basename = None
-    if input_file is not None:
-      output_basename = os.path.basename( input_file )
-      output_basename,_ = os.path.splitext( output_basename )
-    else:
-      output_basename = 'out'
-      if args.output_basename:
-        output_basename = args.output_basename
-      if len(args.latex_snippet_or_file) > 1:
-        output_basename += "-%d"%i
 
-    output_ext = args.output_format
-    if args.output_format == "html":
-      output_ext = "png"
-    output_file = "{}.{}".format(output_basename,output_ext)
+
+  # determine output image filename
+
+  output_basename = args.output_basename
+  if output_basename is None:
+    if input_file is not None:
+      output_basename,_ = os.path.splitext( input_file )
+    else:
+      output_basename = "out"
+  if input_file is None and len(args.latex_snippet_or_file) > 1:
+    output_basename += "-%d"%i
+
+  output_ext = args.output_format
+  if output_ext.lower() == "html":
+    output_ext = "png"
+
+  output_file = "{}.{}".format(output_basename,output_ext)
+
+
+
+
 
   # split output file name into directory a filename parts
   output_dir,output_file = os.path.split(output_file)
@@ -274,7 +272,8 @@ def tex2im(args,i=0):
       text = f.read()
     code = base64.b64encode(text).decode('utf-8')
     text  = r'''<img src="data:image/{fmt};base64,{code}" {opts}>'''.format(fmt="png",code=code,opts="")
-    output_file = "{}.{}".format(output_basename,"html")
+    basename,_ = os.path.splitext( output_file )
+    output_file = "{}.{}".format(basename,"html")
     with open( output_file, 'w' ) as f:
       f.write(text)
 
