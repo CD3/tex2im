@@ -27,7 +27,7 @@ echo "cd'ing to root directory ($root)"
 cd $root
 
 echo "embedding tag in tex2im"
-sed "s/^__version__\s*=\s*[\"'][0-9]\+\.[-0-9]\+[\"']\s*$/__version__ = '${tag}'/" tex2im -i
+sed "s/^__version__\s*=\s*[\"'][0-9]\+\(\.[-0-9]\+\)*[\"']\s*$/__version__ = '${tag}'/" tex2im -i
 
 echo "looking for pre-tag-release.sh to run"
 script=$(find ./ -name 'pre-tag-release.sh')
