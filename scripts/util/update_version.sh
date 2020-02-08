@@ -28,6 +28,7 @@ cd $root
 
 echo "embedding tag in tex2im"
 sed "s/^__version__\s*=\s*[\"'][0-9]\+\(\.[-0-9]\+\)*[\"']\s*$/__version__ = '${tag}'/" tex2im -i
+sed "s/^version\s*=\s*[\"'][0-9]\+\(\.[-0-9]\+\)*[\"']\s*$/version = '${tag}'/" setup.py -i
 
 echo "looking for pre-tag-release.sh to run"
 script=$(find ./ -name 'pre-tag-release.sh')
@@ -37,7 +38,7 @@ then
 fi
 
 echo "commiting tex2im version bump"
-git add tex2im
+git add tex2im setup.py
 git commit -m "version bump: ${tag}"
 echo "tagging with ${tag}"
 git tag -a ${tag}
