@@ -7,6 +7,7 @@ verify_ssl = true
 cram = "*"
 
 [packages]
+twine = "*"
 
 [requires]
 python_version = "3.6"
