@@ -2,7 +2,7 @@
 
 from distutils.core import setup
 
-setup(name='Distutils',
+setup(name='tex2im',
       version='2.0.3',
       description='Command line LaTeX image generator',
       author='C.D. Clark III',
