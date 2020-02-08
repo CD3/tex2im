@@ -236,6 +236,11 @@ def tex2im(args,i=0):
 
   output_file = "{}.{}".format(output_basename,output_ext)
 
+  # check for repeated extension.
+  if output_file.endswith("{0}.{0}".format(output_ext)):
+    output_file,_ = os.path.splitext( output_file )
+
+
 
 
 
