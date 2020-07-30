@@ -51,9 +51,17 @@ to be possible. Just play around a bit to find the optimal settings.
 
 To use `tex2im`, you need `pdflatex` and `convert` (part of image magic) installed.
 For color support, also the latex color style is needed.
-To install `tex2im`, just copy the `tex2im` file to a directory in your PATH.
+You can install `tex2im` with `pip`
 
-    > cp tex2im/tex2im /path/of/your/choice
-    > chmod 755 /path/of/your/choice/tex2im
+```
+> pip3 install tex2im
+```
+
+or just copy the `tex2im` file in this repository to a directory in your PATH.
+
+```
+> cp tex2im/tex2im /path/of/your/choice
+> chmod 755 /path/of/your/choice/tex2im
+````
 
 
