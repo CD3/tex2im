@@ -15,6 +15,23 @@
   $ ${TESTDIR}/tex2im '\nabla' -o my_name.png && ls
   my_name.png
   $ rm my_name.png
+
+# Write to different directory
+  $ mkdir images
+  $ ${TESTDIR}/tex2im '\nabla' -o images && ls
+  images
+  $ ls images
+  out.png
+  $ rm -r images
+
+  $ mkdir images
+  $ ${TESTDIR}/tex2im '\nabla' -o images/my_name && ls
+  images
+  $ ls images
+  my_name.png
+  $ rm -r images
+
+
   $ echo '\nabla' > eq-1.tex
   $ echo "x = 0"  > eq-2.tex
   $ ${TESTDIR}/tex2im eq-*.tex && ls

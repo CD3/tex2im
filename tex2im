@@ -9,6 +9,7 @@ import shutil
 import re
 import subprocess
 import base64
+import pathlib
 
 __version__ = '2.0.3'
 
@@ -221,24 +222,43 @@ def tex2im(args,i=0):
 
   # determine output image filename
 
-  output_basename = args.output_basename
+  output_basename = pathlib.Path(args.output_basename) if args.output_basename is not None else None
+  output_dir = pathlib.Path(curdir)
+
+  # check if output_basename is actually a directory
+  if output_basename is not None:
+    if not output_basename.is_absolute():
+      output_basename = output_dir / output_basename
+
+    if output_basename.is_dir():
+      output_dir = pathlib.Path(output_basename)
+      output_basename = None
+
   if output_basename is None:
     if input_file is not None:
       output_basename,_ = os.path.splitext( input_file )
     else:
       output_basename = "out"
+
+
+
   if input_file is None and len(args.latex_snippet_or_file) > 1:
-    output_basename += "-%d"%i
+    output_basename = str(output_basename)+"-%d"%i
 
   output_ext = args.output_format
   if output_ext.lower() == "html":
     output_ext = "png"
+  if not output_ext.startswith('.'):
+    output_ext = "."+output_ext
 
-  output_file = "{}.{}".format(output_basename,output_ext)
+  if not output_dir.exists():
+    pass
 
-  # check for repeated extension.
-  if output_file.endswith("{0}.{0}".format(output_ext)):
-    output_file,_ = os.path.splitext( output_file )
+  output_file = (output_dir / output_basename).with_suffix(output_ext)
+
+  # # check for repeated extension.
+  # if output_file.endswith("{0}.{0}".format(output_ext)):
+  #   output_file,_ = os.path.splitext( output_file )
 
 
 
