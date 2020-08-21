@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='tex2im',
-      version='2.0.3',
+      version='2.1.0',
       description='Command line LaTeX image generator',
       author='C.D. Clark III',
       author_email='clifton.clark@gmail.com',
