@@ -28,7 +28,7 @@ cd $root
 
 echo "embedding tag in tex2im"
 sed "s/^__version__\s*=\s*[\"'][0-9]\+\(\.[-0-9]\+\)*[\"']\s*$/__version__ = '${tag}'/" tex2im -i
-sed "s/^version\s*=\s*[\"'][0-9]\+\(\.[-0-9]\+\)*[\"']\s*$/version = '${tag}'/" setup.py -i
+sed "s/version\s*=\s*'[^']\+'/version = '${tag}'/" setup.py -i
 
 echo "looking for pre-tag-release.sh to run"
 script=$(find ./ -name 'pre-tag-release.sh')
