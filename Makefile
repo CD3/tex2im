@@ -1,3 +1,6 @@
+test:
+	./testing/pre-tag_release.sh
+
 copy-to-bin:
 	install tex2im ~/bin
 	install im2tex ~/bin
