@@ -57,15 +57,15 @@ parser.add_argument("-s", "--font-size",
                     default=12,
                     help="Document font size.")
 
-parser.add_argument("-b", "--background-color",
-                    action="store",
-                    default="white",
-                    help="Background color.")
-
 parser.add_argument("-t", "--text-color",
                     action="store",
                     default="black",
-                    help="Text color.")
+                    help="Text color. Color support provided by xcolor. Arguments may be a pre-defined xcolor color, such as 'blue', or specify one of the supported xcolor modes as 'mode:arg', such 'HTML:FF7F00'. See xcolor package for supported modes. ")
+
+parser.add_argument("-b", "--background-color",
+                    action="store",
+                    default="white",
+                    help="Background color. See --text-color for argument types.")
 
 parser.add_argument("-x", "--preamble",
                     action="store",
@@ -154,10 +154,22 @@ def tex2im(args,i=0):
 
   # preamble
   latex_lines += r'\documentclass[%dpt]{article}' % args.font_size
-  latex_lines += r'\usepackage{color}'
-  # latex_lines += r'\usepackage[dvips]{graphicx}'
+  latex_lines += r'\usepackage{xcolor}'
   latex_lines += r'\pagestyle{empty}'
-  latex_lines += r'\pagecolor{%s}' % args.background_color
+
+  toks = args.text_color.split(':')
+  if len(toks) == 1:
+    latex_lines += r'\colorlet{text_color}{%s}' % args.text_color
+  else:
+    latex_lines += r'\definecolor{text_color}{%s}{%s}' % (*toks,)
+
+  toks = args.background_color.split(':')
+  if len(toks) == 1:
+    latex_lines += r'\colorlet{background_color}{%s}' % args.background_color
+  else:
+    latex_lines += r'\definecolor{background_color}{%s}{%s}' % (*toks,)
+
+  latex_lines += r'\pagecolor{background_color}'
 
   # look for a preamble file to load
   for preamble in [args.preamble, os.path.join(curdir, '.tex2im_preamble'), os.path.join(os.getenv("HOME"), '.tex2im_preamble'), os.path.join(os.getenv("HOME"), '.tex2im_header')
@@ -170,7 +182,7 @@ def tex2im(args,i=0):
 
   # document
   latex_lines += r'\begin{document}{'
-  latex_lines += r'\color{%s}' % args.text_color
+  latex_lines += r'\color{text_color}'
   if not args.no_equation_environment:
       latex_lines += r'\begin{eqnarray*}'
 
