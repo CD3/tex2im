@@ -6,6 +6,7 @@ import logging
 import os
 import sys
 import shutil
+import shlex
 import re
 import subprocess
 import base64
@@ -289,7 +290,7 @@ def tex2im(args,i=0):
   # add comment containing LaTeX
   comment_lines = tlist()
   comment_lines += "# This image was created with tex2im (https://github.com/CD3/tex2im)"
-  comment_lines += "# " + r' '.join(sys.argv).replace('\\','\\\\')
+  comment_lines += "# " + ' '.join(map(lambda a: rf'"{a}"' if sum([c in a for c in ' ']) else a, sys.argv)).replace('\\','\\\\')
   comment_lines += latex_snippet.replace('\\','\\\\')
   comment_lines += ""
   if not args.no_comment:
