@@ -110,6 +110,10 @@ parser.add_argument("-o", "--output-basename",
                     action="store",
                     help="Basename to use for output filename. Image format extension will be appended.")
 
+parser.add_argument("--stdout",
+                    action="store_true",
+                    help="Write the image to stdout instead of a file.")
+
 args = parser.parse_args()
 
 if args.version:
@@ -234,7 +238,6 @@ def tex2im(args,i=0):
 
 
   # determine output image filename
-
   output_basename = pathlib.Path(args.output_basename) if args.output_basename is not None else None
   output_dir = pathlib.Path(curdir)
 
@@ -328,9 +331,14 @@ def tex2im(args,i=0):
     # logging.error("exiftool output:")
     # logging.error(res.stdout.decode('utf-8'))
 
-  # copy image to working directory
-  logging.info("copying file back to {}".format(os.path.join(curdir,output_file)))
-  shutil.copyfile(output_file, os.path.join(output_dir,output_file))
+  # copy image to working directory or print to stdout
+  if args.stdout:
+    with open( output_file, 'rb' ) as f:
+        os.write(sys.stdout.fileno(), f.read() )
+
+  else:
+      logging.info("copying file back to {}".format(os.path.join(curdir,output_file)))
+      shutil.copyfile(output_file, os.path.join(output_dir,output_file))
 
 
   os.chdir(curdir)
