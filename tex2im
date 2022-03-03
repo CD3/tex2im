@@ -12,7 +12,7 @@ import subprocess
 import base64
 import pathlib
 
-__version__ = '2.3'
+__version__ = '2.4'
 
 # a text-list class for accumulating lines of text
 class tlist(list):
