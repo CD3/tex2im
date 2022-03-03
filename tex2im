@@ -96,7 +96,7 @@ parser.add_argument("-B", "--border",
 parser.add_argument("-r", "--resolution",
                     action="store",
                     default="150x150",
-                    help="Size of border, in pixels.")
+                    help="Output image resolution, in pixels.")
 
 parser.add_argument("-z", "--transparent-background",
                     action="store_true",
@@ -111,6 +111,11 @@ parser.add_argument("-o", "--output-basename",
                     action="store",
                     help="Basename to use for output filename. Image format extension will be appended.")
 
+parser.add_argument("--pdflatex-option",
+                    action="store",
+                    nargs="*",
+                    default=[],
+                    help="A command line option/argument to pass directly to the pdflatex call.")
 parser.add_argument("--stdout",
                     action="store_true",
                     help="Write the image to stdout instead of a file.")
@@ -205,7 +210,7 @@ def tex2im(args,i=0):
       f.write('\n'.join(latex_lines))
 
   # TODO: detect image files in the latex snippet make them available in the tempdir
-  latex_cmd = "pdflatex -interaction=nonstopmode out.tex"
+  latex_cmd = f"pdflatex -interaction=nonstopmode {' '.join(args.pdflatex_option)} out.tex"
   logging.info("running LaTeX: {}".format(latex_cmd))
   res = subprocess.run( latex_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT )
   if res.returncode:
