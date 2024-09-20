@@ -91,9 +91,15 @@ def main(
     border: Annotated[
         int, typer.Option("-B", "--border", help="Size of border, in pixels.")
     ] = 0,
-    resolution: Annotated[
+    # resolution: Annotated[
+    #     str,
+    #     typer.Option("-r", "--resolution", help="Output image resolution, in pixels."),
+    # ] = "150x150",
+    density: Annotated[
         str,
-        typer.Option("-r", "--resolution", help="Output image resolution, in pixels."),
+        typer.Option(
+            "-D", "--density", help="Output image density, in pixels per inch."
+        ),
     ] = "150x150",
     transparent_background: Annotated[
         bool,
@@ -269,7 +275,7 @@ def make_image(config):
     convert_cmd = "convert -trim -border {BORDER} -bordercolor {BORDERCOLOR} +adjoin -density {DENSITY}".format(
         BORDER=config.border,
         BORDERCOLOR=config.background_color,
-        DENSITY=config.resolution,
+        DENSITY=config.density,
     )
     if config.anti_aliasing == -1 and config.transparent_background:
         convert_cmd += " +antialias"

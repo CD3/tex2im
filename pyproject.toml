@@ -1,7 +1,7 @@
 [project]
 name = "tex2im"
-version = "0.1.0"
-description = "Add your description here"
+version = "2.4.0"
+description = "Create images from latex snippets."
 dependencies = [
     "typer>=0.12.5",
 ]
