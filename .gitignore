@@ -2,3 +2,4 @@
 requirements-dev.lock
 requirements.lock
 src/tex2im/__pycache__
+uv.lock
