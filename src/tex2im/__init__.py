@@ -1,6 +1,6 @@
 import base64
 import copy
-import importlib
+import importlib.metadata
 import inspect
 import logging
 import os
@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import types
+from string import Template
 
 import rich
 import typer
@@ -64,6 +65,13 @@ def main(
             "-x", "--preamble", help="Read additional preamble lines from file."
         ),
     ] = None,
+    no_preamble: Annotated[
+        bool,
+        typer.Option(
+            "--no-preamble",
+            help="Do not read preamble lines from special files, read lines only from --preamble option if given.",
+        ),
+    ] = False,
     no_equation_environment: Annotated[
         bool,
         typer.Option(
@@ -91,10 +99,6 @@ def main(
     border: Annotated[
         int, typer.Option("-B", "--border", help="Size of border, in pixels.")
     ] = 0,
-    # resolution: Annotated[
-    #     str,
-    #     typer.Option("-r", "--resolution", help="Output image resolution, in pixels."),
-    # ] = "150x150",
     density: Annotated[
         str,
         typer.Option(
@@ -127,13 +131,20 @@ def main(
         List[str],
         typer.Option(
             "--pdflatex-option",
-            help="A command line option/argument to pass directly to the pdflatex call. Can be given multiple times.",
+            help="DEPRECATED! Use --latex-cmd-template instead.",
         ),
     ] = [],
     stdout: Annotated[
         bool,
         typer.Option("--stdout", help="Write the image to stdout instead of a file."),
     ] = False,
+    latex_cmd_template: Annotated[
+        str,
+        typer.Option(
+            "--latex-cmd-template",
+            help="Template string that will be 'rendered' to produce the latex command used to compile the image. The template string should contain a placeholder named '$INPUT_FILE' which will be used to insert the latex source file into the command.",
+        ),
+    ] = "pdflatex -interaction=nonstopmode $INPUT_FILE",
 ) -> int:
     """
     A utility for creating image files from latex snippets.
@@ -142,6 +153,9 @@ def main(
     if version:
         rich.print(f"version: {__version__}")
         raise typer.Exit(0)
+
+    LATEX_CMD_TEMPLATE = Template(latex_cmd_template)
+    latex_cmd = LATEX_CMD_TEMPLATE.safe_substitute(INPUT_FILE="out.tex")
 
     if debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -158,6 +172,7 @@ def main(
         config = {arg: values[arg] for arg in args}
         config["latex_snippet_or_file"] = f
         config["idx"] = i if len(latex_snippet_or_file) > 1 else None
+        config["latex_cmd"] = latex_cmd
         configs.append(types.SimpleNamespace(**config))
 
     for config in configs:
@@ -195,7 +210,7 @@ def make_image(config):
         logging.info("{} is a file, reading now".format(input_file))
         with open(input_file) as f:
             # read lines, but remove comments
-            lines = filter(lambda x: not re.match("\s*#", x), f.readlines())
+            lines = filter(lambda x: not re.match(r"\s*#", x), f.readlines())
             latex_snippet = "".join(lines).strip()
 
     logging.info("LaTeX snippet: {}".format(latex_snippet))
@@ -226,12 +241,14 @@ def make_image(config):
     latex_lines += r"\pagecolor{background_color}"
 
     # look for a preamble file to load
-    for preamble in [
-        config.preamble,
-        os.path.join(curdir, ".tex2im_preamble"),
-        os.path.join(os.getenv("HOME"), ".tex2im_preamble"),
-        os.path.join(os.getenv("HOME"), ".tex2im_header"),
-    ]:
+    preamble_file_candidates = [config.preamble]
+    if not config.no_preamble:
+        preamble_file_candidates += [
+            os.path.join(curdir, ".tex2im_preamble"),
+            os.path.join(os.getenv("HOME"), ".tex2im_preamble"),
+            os.path.join(os.getenv("HOME"), ".tex2im_header"),
+        ]
+    for preamble in preamble_file_candidates:
         if preamble is not None and os.path.isfile(preamble):
             with open(preamble, "r") as f:
                 latex_lines += f.readlines()
@@ -256,9 +273,8 @@ def make_image(config):
         f.write("\n".join(latex_lines))
 
     # TODO: detect image files in the latex snippet make them available in the tempdir
-    latex_cmd = (
-        f"pdflatex -interaction=nonstopmode {' '.join(config.pdflatex_option)} out.tex"
-    )
+    latex_cmd = config.latex_cmd
+
     logging.info("running LaTeX: {}".format(latex_cmd))
     res = subprocess.run(
         latex_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
