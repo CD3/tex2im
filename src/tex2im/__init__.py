@@ -167,7 +167,6 @@ def main(
     configs = []
     current_frame = inspect.currentframe()
     args, _, _, values = inspect.getargvalues(current_frame)
-    del values["current_frame"]
     for i, f in enumerate(latex_snippet_or_file):
         config = {arg: values[arg] for arg in args}
         config["latex_snippet_or_file"] = f
