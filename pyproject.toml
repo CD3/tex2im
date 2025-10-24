@@ -4,7 +4,7 @@ requires = [ "hatchling" ]
 
 [project]
 name = "tex2im"
-version = "2.5.0"
+version = "2.5.1"
 description = "Create images from latex snippets."
 readme = "README.md"
 authors = [
