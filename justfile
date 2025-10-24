@@ -1,2 +1,2 @@
 test:
-  cd testing; rye run cram *.t
+    cd testing; uv run cram *.t
