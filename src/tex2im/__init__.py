@@ -76,7 +76,7 @@ def main(
         bool,
         typer.Option(
             "-n",
-            "--equation-environment",
+            "--no-equation-environment",
             help="Do not wrap snippet in equation environment. Useful if you want to use your own environment.",
         ),
     ] = False,
