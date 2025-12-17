@@ -27,7 +27,7 @@ def main(
     latex_snippet_or_file: Annotated[
         List[str],
         typer.Argument(
-            help="LaTeX snippet or filename conotainting latex code to compile."
+            help="LaTeX snippet or filename containting latex code to compile."
         ),
     ] = None,
     version: Annotated[bool, typer.Option(help="Show version number.")] = False,
