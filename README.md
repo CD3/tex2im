@@ -2,11 +2,11 @@
 
 Tex2im is a simple tool that converts LaTeX formulas into high resolution
 pixmap graphics for inclusion in text processors or presentations.
-The original script written by Andreas Reigber in bash, and his official releases are still available at
+The original script written by Andreas Reigber in bash, and his official releases, are still available at
 http://www.nought.de/tex2im.php.
 
 Version 2.0 was a complete rewrite in Python. While the Python script shares the same interface (it accepts mostly the same command line options),
-it does not share any code, other than the `convert` command that is ran to generate the final image.
+it does not share any code, other than the `convert` command that is run to generate the final image.
 
 # Examples:
 
@@ -26,11 +26,12 @@ This time, the result is a color formula.
 
     > tex2im "\sum_{i=0}^5 x_i^2"
 
-generates a file named 'out.png', containing the formula
+generates a file named 'out.png', containing the formula.
+
+Multiple files can be processed at once.
 
     > tex2im *.tex
 
-this is how multiple files can be processed.
 
 Note that example4.tex needs the '-n' (no-formula) option when processed.
 
@@ -53,15 +54,12 @@ To use `tex2im`, you need `pdflatex` and `convert` (part of image magic) install
 For color support, also the latex color style is needed.
 You can install `tex2im` with `pip`
 
+```bash
+> pip install tex2im
 ```
-> pip3 install tex2im
+
+or your favoriate package manager
+
+```bash
+> uv tool install tex2im
 ```
-
-or just copy the `tex2im` file in this repository to a directory in your PATH.
-
-```
-> cp tex2im/tex2im /path/of/your/choice
-> chmod 755 /path/of/your/choice/tex2im
-````
-
-
